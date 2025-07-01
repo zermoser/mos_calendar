@@ -57,14 +57,15 @@ const CalendarApp: React.FC = () => {
     social: { color: 'bg-purple-500', label: 'สังคม' }
   };
 
-  // Month names in Thai
-  const monthNames = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-  ];
-
   // Day names in Thai (short form)
   const dayNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+
+  // Formatter for Thailand time (Bangkok timezone)
+  const thaiDateFormatter = useMemo(() => new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok' }), []);
+  const thaiMonthYearFormatter = useMemo(() => new Intl.DateTimeFormat('th-TH', { year: 'numeric', month: 'long', timeZone: 'Asia/Bangkok' }), []);
+  const thaiDayFormatter = useMemo(() => new Intl.DateTimeFormat('th-TH', { day: 'numeric', timeZone: 'Asia/Bangkok' }), []);
+  const thaiYearFormatter = useMemo(() => new Intl.DateTimeFormat('th-TH', { year: 'numeric', timeZone: 'Asia/Bangkok' }), []);
+
 
   // useEffect hook to initialize the calendar with today's date and sample events
   useEffect(() => {
@@ -251,13 +252,13 @@ const CalendarApp: React.FC = () => {
     setShowYearSelector(false); // Close year selector after selection
   };
 
-  // Check if a given date is today
+  // Check if a given date is today (based on user's local timezone for "today")
   const isToday = (date: Date) => {
     const today = new Date();
     return date.toDateString() === today.toDateString();
   };
 
-  // Check if a given date is the currently selected date
+  // Check if a given date is the currently selected date (based on user's local timezone for comparison)
   const isSelected = (date: Date) => {
     return date.toDateString() === selectedDate.toDateString();
   };
@@ -401,6 +402,8 @@ const CalendarApp: React.FC = () => {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">ปฏิทินอัจฉริยะ</h1>
                 <p className="text-gray-600">จัดการเวลาอย่างมีประสิทธิภาพ</p>
+                {/* Thailand Time Reference Note */}
+                <p className="text-xs text-gray-500 mt-1">เวลาอ้างอิง: ประเทศไทย (GMT+7)</p>
               </div>
             </div>
 
@@ -452,7 +455,7 @@ const CalendarApp: React.FC = () => {
 
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg lg:text-xl font-semibold text-gray-900">
-                        {monthNames[currentDate.getMonth()]}
+                        {thaiMonthYearFormatter.format(currentDate).split(' ')[0]} {/* Display month in Thai */}
                       </h2>
 
                       {/* Year Selector */}
@@ -463,7 +466,7 @@ const CalendarApp: React.FC = () => {
                           aria-label="Select year"
                         >
                           <span className="text-lg lg:text-xl font-semibold">
-                            {currentDate.getFullYear()}
+                            {thaiYearFormatter.format(currentDate)} {/* Display year in Thai */}
                           </span>
                           <ChevronDown className="w-4 h-4 text-gray-500" />
                         </button>
@@ -538,7 +541,7 @@ const CalendarApp: React.FC = () => {
                       >
                         <div className={`text-sm lg:text-base font-medium mb-1 ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
                           } ${isToday(date) ? 'text-blue-600' : ''}`}>
-                          {date.getDate()}
+                          {thaiDayFormatter.format(date)} {/* Display day in Thai */}
                         </div>
 
                         {hasEvents && (
@@ -605,7 +608,7 @@ const CalendarApp: React.FC = () => {
             {/* Selected Day Events */}
             <div className="bg-white rounded-2xl shadow-xl p-4 lg:p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                กิจกรรมวันที่ {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+                กิจกรรมวันที่ {thaiDateFormatter.format(selectedDate)} {/* Display selected date in Thai */}
               </h3>
 
               <div className="space-y-3 max-h-80 lg:max-h-96 overflow-y-auto">
