@@ -20,7 +20,7 @@ const CalendarApp: React.FC = () => {
   // State for the date selected by the user (e.g., clicking on a day cell)
   const [selectedDate, setSelectedDate] = useState(new Date());
   // State to store all calendar events
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]); // Added missing ')' here
   // State to control the visibility of the event creation/edit modal
   const [showEventModal, setShowEventModal] = useState(false);
   // State to hold the event being edited (null if creating a new event)
@@ -263,7 +263,7 @@ const CalendarApp: React.FC = () => {
   const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-sans text-gray-800">
       {/* Tailwind CSS CDN for global styling */}
       <script src="https://cdn.tailwindcss.com"></script>
       {/* Inter font for better typography */}
@@ -288,13 +288,31 @@ const CalendarApp: React.FC = () => {
           .overflow-y-auto::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; /* gray-400 */
           }
+
+          /* Animations */
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideInDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+          @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+          }
+
+          .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+          .animate-slide-in-down { animation: slideInDown 0.3s ease-out forwards; }
+          .animate-scale-in { animation: scaleIn 0.3s ease-out forwards; }
         `}
       </style>
 
       {/* Mobile Header (visible on small screens) */}
-      <div className="lg:hidden bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+      <div className="lg:hidden bg-white shadow-lg px-4 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-500 rounded-lg">
+          <div className="p-2 bg-blue-500 rounded-lg shadow-md">
             <Calendar className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-gray-900">ปฏิทิน</h1>
@@ -302,14 +320,14 @@ const CalendarApp: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowEventModal(true)}
-            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-all duration-200 shadow-md transform active:scale-95"
             aria-label="Add new event"
           >
             <Plus className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
             aria-label="Toggle mobile menu"
           >
             <Menu className="w-5 h-5" />
@@ -319,8 +337,8 @@ const CalendarApp: React.FC = () => {
 
       {/* Mobile Menu (conditionally visible) */}
       {showMobileMenu && (
-        <div className="lg:hidden bg-white border-b shadow-sm px-4 py-3 animate-fade-in-down">
-          <div className="flex gap-2 mb-3">
+        <div className="lg:hidden bg-white border-b border-gray-100 shadow-md px-4 py-3 animate-slide-in-down">
+          <div className="flex gap-2 mb-3 justify-center">
             {/* View selection buttons (month, week, day) */}
             {['month', 'week', 'day'].map((v) => (
               <button
@@ -329,8 +347,8 @@ const CalendarApp: React.FC = () => {
                   setView(v as any);
                   setShowMobileMenu(false); // Close menu after selection
                 }}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${view === v
-                    ? 'bg-blue-500 text-white'
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${view === v
+                    ? 'bg-blue-500 text-white transform scale-105'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
@@ -347,7 +365,7 @@ const CalendarApp: React.FC = () => {
               placeholder="ค้นหากิจกรรม..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               aria-label="Search events"
             />
           </div>
@@ -356,7 +374,7 @@ const CalendarApp: React.FC = () => {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
             aria-label="Filter by category"
           >
             <option value="all">ทุกหมวดหมู่</option>
@@ -370,10 +388,10 @@ const CalendarApp: React.FC = () => {
       {/* Main content area */}
       <div className="container mx-auto p-4 max-w-7xl">
         {/* Desktop Header (visible on large screens) */}
-        <div className="hidden lg:block bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="hidden lg:block bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500 rounded-xl shadow-md">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
                 <Calendar className="w-7 h-7 text-white" />
               </div>
               <div>
@@ -384,14 +402,14 @@ const CalendarApp: React.FC = () => {
 
             <div className="flex items-center gap-3">
               {/* View selection buttons for desktop */}
-              <div className="flex bg-gray-100 rounded-lg p-1 shadow-inner">
+              <div className="flex bg-gray-100 rounded-lg p-1 shadow-inner border border-gray-200">
                 {['month', 'week', 'day'].map((v) => (
                   <button
                     key={v}
                     onClick={() => setView(v as any)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === v
-                        ? 'bg-white shadow-sm text-blue-600'
-                        : 'text-gray-600 hover:text-gray-900'
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${view === v
+                        ? 'bg-white shadow-md text-blue-600 ring-1 ring-blue-200'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                       }`}
                   >
                     {v === 'month' ? 'เดือน' : v === 'week' ? 'สัปดาห์' : 'วัน'}
@@ -402,7 +420,7 @@ const CalendarApp: React.FC = () => {
               {/* Add Event button for desktop */}
               <button
                 onClick={() => setShowEventModal(true)}
-                className="bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 font-medium shadow-md"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-lg transform active:scale-95"
               >
                 <Plus className="w-5 h-5" />
                 เพิ่มกิจกรรม
@@ -415,14 +433,14 @@ const CalendarApp: React.FC = () => {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Calendar Section */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
               {/* Calendar Header (Month Navigation) */}
               <div className="p-4 lg:p-6 border-b border-gray-100">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => navigateMonth('prev')}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900"
+                      className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200 text-gray-600 hover:text-gray-900 transform active:scale-95"
                       aria-label="Previous month"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -437,7 +455,7 @@ const CalendarApp: React.FC = () => {
                       <div className="relative">
                         <button
                           onClick={() => setShowYearSelector(!showYearSelector)}
-                          className="flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors text-gray-900"
+                          className="flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-gray-100 transition-all duration-200 text-gray-900 transform active:scale-95"
                           aria-label="Select year"
                         >
                           <span className="text-lg lg:text-xl font-semibold">
@@ -447,12 +465,12 @@ const CalendarApp: React.FC = () => {
                         </button>
 
                         {showYearSelector && (
-                          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-30 max-h-48 overflow-y-auto w-32">
+                          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-30 max-h-48 overflow-y-auto w-32 animate-scale-in origin-top-left">
                             {years.map(year => (
                               <button
                                 key={year}
                                 onClick={() => changeYear(year)}
-                                className={`w-full px-4 py-2 text-left hover:bg-blue-50 transition-colors text-gray-700 ${year === currentYear ? 'bg-blue-100 text-blue-700 font-semibold' : ''
+                                className={`w-full px-4 py-2 text-left hover:bg-blue-50 transition-colors duration-150 text-gray-700 ${year === currentYear ? 'bg-blue-100 text-blue-700 font-semibold' : ''
                                   }`}
                               >
                                 {year}
@@ -465,7 +483,7 @@ const CalendarApp: React.FC = () => {
 
                     <button
                       onClick={() => navigateMonth('next')}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900"
+                      className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200 text-gray-600 hover:text-gray-900 transform active:scale-95"
                       aria-label="Next month"
                     >
                       <ChevronRight className="w-5 h-5" />
@@ -479,7 +497,7 @@ const CalendarApp: React.FC = () => {
                       setCurrentDate(today);
                       setSelectedDate(today);
                     }}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium shadow-md"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 text-sm font-medium shadow-md transform active:scale-95"
                   >
                     วันนี้
                   </button>
@@ -509,13 +527,13 @@ const CalendarApp: React.FC = () => {
                         className={`
                           min-h-16 lg:min-h-24 p-1 lg:p-2 rounded-lg cursor-pointer transition-all duration-200 relative
                           ${isCurrentMonth ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white hover:bg-gray-50'}
-                          ${isToday(date) ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
+                          ${isToday(date) ? 'ring-2 ring-blue-500 bg-blue-50 font-bold' : ''}
                           ${isSelected(date) ? 'bg-blue-100 ring-1 ring-blue-300 shadow-inner' : ''}
                           flex flex-col
                         `}
                       >
                         <div className={`text-sm lg:text-base font-medium mb-1 ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                          } ${isToday(date) ? 'text-blue-600 font-bold' : ''}`}>
+                          } ${isToday(date) ? 'text-blue-600' : ''}`}>
                           {date.getDate()}
                         </div>
 
@@ -525,7 +543,7 @@ const CalendarApp: React.FC = () => {
                             {dayEvents.slice(0, window.innerWidth < 1024 ? 1 : 2).map(event => (
                               <div
                                 key={event.id}
-                                className={`text-xs px-1 lg:px-2 py-0.5 rounded text-white truncate ${categories[event.category].color}`}
+                                className={`text-xs px-1 lg:px-2 py-0.5 rounded text-white truncate ${categories[event.category].color} shadow-sm`}
                                 title={event.title} // Show full title on hover
                               >
                                 {event.title}
@@ -550,7 +568,7 @@ const CalendarApp: React.FC = () => {
           {/* Sidebar Section */}
           <div className="lg:col-span-1 space-y-6">
             {/* Search and Filter - Desktop Only */}
-            <div className="hidden lg:block bg-white rounded-2xl shadow-lg p-6">
+            <div className="hidden lg:block bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">ค้นหาและกรอง</h3>
 
               <div className="space-y-4">
@@ -561,7 +579,7 @@ const CalendarApp: React.FC = () => {
                     placeholder="ค้นหากิจกรรม..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     aria-label="Search events"
                   />
                 </div>
@@ -569,7 +587,7 @@ const CalendarApp: React.FC = () => {
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                   aria-label="Filter by category"
                 >
                   <option value="all">ทุกหมวดหมู่</option>
@@ -581,7 +599,7 @@ const CalendarApp: React.FC = () => {
             </div>
 
             {/* Selected Day Events */}
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6">
+            <div className="bg-white rounded-2xl shadow-xl p-4 lg:p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 กิจกรรมวันที่ {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}
               </h3>
@@ -594,7 +612,7 @@ const CalendarApp: React.FC = () => {
                   </div>
                 ) : (
                   getFilteredEvents(selectedDate).map(event => (
-                    <div key={event.id} className="p-3 lg:p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
+                    <div key={event.id} className="p-3 lg:p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-2">
                           <div className={`w-3 h-3 rounded-full ${categories[event.category].color}`}></div>
@@ -603,14 +621,14 @@ const CalendarApp: React.FC = () => {
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleEditEvent(event)}
-                            className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                            className="p-1 text-gray-400 hover:text-blue-500 transition-colors duration-200 transform active:scale-95"
                             aria-label={`Edit event ${event.title}`}
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteEvent(event.id)}
-                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                            className="p-1 text-gray-400 hover:text-red-500 transition-colors duration-200 transform active:scale-95"
                             aria-label={`Delete event ${event.title}`}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -646,13 +664,13 @@ const CalendarApp: React.FC = () => {
             </div>
 
             {/* Categories Overview */}
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6">
+            <div className="bg-white rounded-2xl shadow-xl p-4 lg:p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">หมวดหมู่</h3>
               <div className="space-y-2">
                 {Object.entries(categories).map(([key, { color, label }]) => {
                   const count = events.filter(e => e.category === key).length;
                   return (
-                    <div key={key} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div key={key} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                       <div className="flex items-center gap-3">
                         <div className={`w-4 h-4 rounded-full ${color}`}></div>
                         <span className="text-gray-700">{label}</span>
@@ -677,7 +695,7 @@ const CalendarApp: React.FC = () => {
                   </h2>
                   <button
                     onClick={handleCloseModal}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 transform active:scale-95"
                     aria-label="Close modal"
                   >
                     <X className="w-6 h-6" />
@@ -694,7 +712,7 @@ const CalendarApp: React.FC = () => {
                       type="text"
                       value={newEvent.title || ''}
                       onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       placeholder="ใส่ชื่อกิจกรรม..."
                       required
                     />
@@ -709,7 +727,7 @@ const CalendarApp: React.FC = () => {
                       value={newEvent.description || ''}
                       onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
                       placeholder="ใส่รายละเอียดกิจกรรม..."
                     />
                   </div>
@@ -724,7 +742,7 @@ const CalendarApp: React.FC = () => {
                         type="date"
                         value={newEvent.date || ''}
                         onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                         required
                       />
                     </div>
@@ -738,7 +756,7 @@ const CalendarApp: React.FC = () => {
                         type="time"
                         value={newEvent.time || ''}
                         onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                         required
                       />
                     </div>
@@ -752,7 +770,7 @@ const CalendarApp: React.FC = () => {
                       id="event-category"
                       value={newEvent.category || 'personal'}
                       onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value as CalendarEvent['category'] })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                     >
                       {Object.entries(categories).map(([key, { label }]) => (
                         <option key={key} value={key}>{label}</option>
@@ -769,7 +787,7 @@ const CalendarApp: React.FC = () => {
                       type="text"
                       value={newEvent.location || ''}
                       onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       placeholder="ใส่สถานที่..."
                     />
                   </div>
@@ -783,7 +801,7 @@ const CalendarApp: React.FC = () => {
                       type="text"
                       value={newEvent.attendees?.join(', ') || ''}
                       onChange={(e) => setNewEvent({ ...newEvent, attendees: e.target.value.split(',').map(s => s.trim()).filter(s => s !== '') })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       placeholder="เช่น จอห์น, เจน"
                     />
                   </div>
@@ -796,7 +814,7 @@ const CalendarApp: React.FC = () => {
                       id="event-reminder"
                       value={newEvent.reminder || 15}
                       onChange={(e) => setNewEvent({ ...newEvent, reminder: parseInt(e.target.value) })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                     >
                       <option value={0}>ไม่มี</option>
                       <option value={5}>5 นาที</option>
@@ -812,13 +830,13 @@ const CalendarApp: React.FC = () => {
                 <div className="mt-8 flex justify-end gap-3">
                   <button
                     onClick={handleCloseModal}
-                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium shadow-sm"
+                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-all duration-200 font-medium shadow-sm transform active:scale-95"
                   >
                     ยกเลิก
                   </button>
                   <button
                     onClick={handleSaveEvent}
-                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-md flex items-center gap-2"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-md flex items-center gap-2 transform active:scale-95"
                   >
                     <Check className="w-5 h-5" />
                     {editingEvent ? 'บันทึกการเปลี่ยนแปลง' : 'เพิ่มกิจกรรม'}
