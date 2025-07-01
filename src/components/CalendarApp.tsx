@@ -20,7 +20,7 @@ const CalendarApp: React.FC = () => {
   // State for the date selected by the user (e.g., clicking on a day cell)
   const [selectedDate, setSelectedDate] = useState(new Date());
   // State to store all calendar events
-  const [events, setEvents] = useState<CalendarEvent[]>([]); // Added missing ')' here
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   // State to control the visibility of the event creation/edit modal
   const [showEventModal, setShowEventModal] = useState(false);
   // State to hold the event being edited (null if creating a new event)
@@ -46,6 +46,8 @@ const CalendarApp: React.FC = () => {
     attendees: [],
     reminder: 15
   });
+  // State for displaying validation error messages in the modal
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Define event categories with their associated colors and labels
   const categories = {
@@ -168,10 +170,11 @@ const CalendarApp: React.FC = () => {
   const handleSaveEvent = () => {
     // Basic validation for required fields
     if (!newEvent.title || !newEvent.date || !newEvent.time) {
-      // In a real app, you'd show a user-friendly error message here (e.g., a toast notification)
-      console.error("Title, date, and time are required.");
+      setErrorMessage('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ชื่อกิจกรรม, วันที่, เวลา).');
       return;
     }
+
+    setErrorMessage(''); // Clear error message if validation passes
 
     const eventToSave: CalendarEvent = {
       id: editingEvent?.id || Date.now().toString(), // Use existing ID if editing, otherwise generate new
@@ -200,6 +203,7 @@ const CalendarApp: React.FC = () => {
   const handleCloseModal = () => {
     setShowEventModal(false);
     setEditingEvent(null);
+    setErrorMessage(''); // Clear error message on modal close
     setNewEvent({
       title: '',
       description: '',
@@ -670,15 +674,31 @@ const CalendarApp: React.FC = () => {
                 {Object.entries(categories).map(([key, { color, label }]) => {
                   const count = events.filter(e => e.category === key).length;
                   return (
-                    <div key={key} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                    <button
+                      key={key}
+                      onClick={() => setFilterCategory(key)} // Set filter on click
+                      className={`flex items-center justify-between p-2 rounded-lg w-full text-left transition-colors duration-200
+                        ${filterCategory === key ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-50 text-gray-700'}`}
+                    >
                       <div className="flex items-center gap-3">
                         <div className={`w-4 h-4 rounded-full ${color}`}></div>
-                        <span className="text-gray-700">{label}</span>
+                        <span>{label}</span>
                       </div>
                       <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{count}</span>
-                    </div>
+                    </button>
                   );
                 })}
+                <button
+                  onClick={() => setFilterCategory('all')} // Option to show all categories
+                  className={`flex items-center justify-between p-2 rounded-lg w-full text-left transition-colors duration-200
+                    ${filterCategory === 'all' ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-50 text-gray-700'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full bg-gray-300"></div> {/* Neutral color for 'all' */}
+                    <span>ทุกหมวดหมู่</span>
+                  </div>
+                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{events.length}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -701,6 +721,14 @@ const CalendarApp: React.FC = () => {
                     <X className="w-6 h-6" />
                   </button>
                 </div>
+
+                {/* Error Message Display */}
+                {errorMessage && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
+                    <strong className="font-bold">ข้อผิดพลาด!</strong>
+                    <span className="block sm:inline ml-2">{errorMessage}</span>
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   <div>
@@ -852,3 +880,4 @@ const CalendarApp: React.FC = () => {
 };
 
 export default CalendarApp;
+
