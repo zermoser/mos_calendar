@@ -6,7 +6,7 @@ interface CalendarEvent {
   id: string;
   title: string;
   description: string;
-  date: string; // YYYY-MM-DD format
+  date: string; // YYYY-MM-DD format (local date)
   time: string; // HH:MM format
   category: 'work' | 'personal' | 'health' | 'social';
   location?: string;
@@ -66,16 +66,30 @@ const CalendarApp: React.FC = () => {
   const thaiDayFormatter = useMemo(() => new Intl.DateTimeFormat('th-TH', { day: 'numeric', timeZone: 'Asia/Bangkok' }), []);
   const thaiYearFormatter = useMemo(() => new Intl.DateTimeFormat('th-TH', { year: 'numeric', timeZone: 'Asia/Bangkok' }), []);
 
+  // Helper function to get YYYY-MM-DD string from a Date object based on its local components
+  const getLocalISODateString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   // useEffect hook to initialize the calendar with today's date and sample events
   useEffect(() => {
     const today = new Date();
     setCurrentDate(today);
     setSelectedDate(today);
+
+    // Get today's date string in local format (YYYY-MM-DD)
+    const todayLocalString = getLocalISODateString(today);
+    // Get tomorrow's date string in local format (YYYY-MM-DD)
+    const tomorrow = new Date(today.getTime() + 86400000); // Add one day in milliseconds
+    const tomorrowLocalString = getLocalISODateString(tomorrow);
+
     // Set default date and time for new event based on today
     setNewEvent(prev => ({
       ...prev,
-      date: today.toISOString().split('T')[0],
+      date: todayLocalString, // Use local date string here
       time: '09:00'
     }));
 
@@ -85,7 +99,7 @@ const CalendarApp: React.FC = () => {
         id: '1',
         title: 'ประชุมทีม',
         description: 'ประชุมรายสัปดาห์กับทีมงาน',
-        date: today.toISOString().split('T')[0],
+        date: todayLocalString, // Use local date string here
         time: '10:00',
         category: 'work',
         location: 'ห้องประชุม A',
@@ -96,7 +110,7 @@ const CalendarApp: React.FC = () => {
         id: '2',
         title: 'ออกกำลังกาย',
         description: 'วิ่งในสวนสาธารณะ',
-        date: new Date(today.getTime() + 86400000).toISOString().split('T')[0], // Tomorrow
+        date: tomorrowLocalString, // Use local date string for tomorrow
         time: '06:00',
         category: 'health',
         location: 'สวนลุมพินี',
@@ -106,7 +120,7 @@ const CalendarApp: React.FC = () => {
         id: '3',
         title: 'ทานข้าวกับเพื่อน',
         description: 'นัดทานข้าวเย็นที่ร้านอาหาร',
-        date: today.toISOString().split('T')[0],
+        date: todayLocalString, // Use local date string here
         time: '19:00',
         category: 'social',
         location: 'ร้านอาหารไทย',
@@ -155,7 +169,7 @@ const CalendarApp: React.FC = () => {
 
   // Function to filter events based on selected date, search term, and category
   const getFilteredEvents = (date: Date) => {
-    const dateString = date.toISOString().split('T')[0];
+    const dateString = getLocalISODateString(date); // Use local date string for comparison
     return events.filter(event => {
       const matchesDate = event.date === dateString;
       const matchesSearch = searchTerm === '' ||
@@ -208,7 +222,7 @@ const CalendarApp: React.FC = () => {
     setNewEvent({
       title: '',
       description: '',
-      date: selectedDate.toISOString().split('T')[0], // Default to selected date
+      date: getLocalISODateString(selectedDate), // Default to selected date's local string
       time: '09:00', // Default time
       category: 'personal',
       location: '',
