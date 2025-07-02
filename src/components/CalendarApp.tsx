@@ -49,6 +49,16 @@ const CalendarApp: React.FC = () => {
   // State for displaying validation error messages in the modal
   const [errorMessage, setErrorMessage] = useState('');
 
+  // เพิ่ม state สำหรับ attendees input แยกต่างหาก
+  const [attendeesInput, setAttendeesInput] = useState('');
+
+  // ใน useEffect ตอนเปิด modal
+  useEffect(() => {
+    if (showEventModal) {
+      setAttendeesInput(newEvent.attendees?.join(', ') || '');
+    }
+  }, [showEventModal, newEvent.attendees]);
+
   // Define event categories with their associated colors and labels
   const categories = {
     work: { color: 'bg-blue-500', label: 'งาน' },
@@ -367,8 +377,8 @@ const CalendarApp: React.FC = () => {
                   setShowMobileMenu(false); // Close menu after selection
                 }}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm ${view === v
-                    ? 'bg-blue-500 text-white transform scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-500 text-white transform scale-105'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
                 {v === 'month' ? 'เดือน' : v === 'week' ? 'สัปดาห์' : 'วัน'}
@@ -429,8 +439,8 @@ const CalendarApp: React.FC = () => {
                     key={v}
                     onClick={() => setView(v as any)}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${view === v
-                        ? 'bg-white shadow-md text-blue-600 ring-1 ring-blue-200'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                      ? 'bg-white shadow-md text-blue-600 ring-1 ring-blue-200'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                       }`}
                   >
                     {v === 'month' ? 'เดือน' : v === 'week' ? 'สัปดาห์' : 'วัน'}
@@ -844,8 +854,12 @@ const CalendarApp: React.FC = () => {
                     <input
                       id="event-attendees"
                       type="text"
-                      value={newEvent.attendees?.join(', ') || ''}
-                      onChange={(e) => setNewEvent({ ...newEvent, attendees: e.target.value.split(',').map(s => s.trim()).filter(s => s !== '') })}
+                      value={attendeesInput}
+                      onChange={(e) => setAttendeesInput(e.target.value)}
+                      onBlur={() => {
+                        const attendees = attendeesInput.split(',').map(s => s.trim()).filter(s => s !== '');
+                        setNewEvent({ ...newEvent, attendees });
+                      }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       placeholder="เช่น จอห์น, เจน"
                     />
